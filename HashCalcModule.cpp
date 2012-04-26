@@ -9,7 +9,10 @@
  */
 
 /** \file HashCalcModule.cpp 
- * C++ Framework module that calculates hash values of file content. */
+ * C++ Framework module that calculates hash values of file content and saves
+ * them to the database
+ */
+
 // System includes
 #include <windows.h>
 #include <sstream>
@@ -29,7 +32,7 @@ static const uint32_t FILE_BUFFER_SIZE = 8192;
 static bool calculateMD5 = false;
 static bool calculateSHA1 = false;
 
-// Names that will be used to store data in blackboard
+// Names that are used as arguments to the initialize method
 static const std::string MD5_NAME("MD5");
 static const std::string SHA1_NAME("SHA1");
 
@@ -102,43 +105,36 @@ extern "C"
             Poco::DigestOutputStream sha1dos(sha1);
 
             char buffer[FILE_BUFFER_SIZE];
-            int bytesRead = 0;
             bool read = false;
 
             // Read file content into buffer and write it to the DigestOutputStream.
-            do {
-                bytesRead = pFile->read(buffer, FILE_BUFFER_SIZE);
+            while (1) {
+                ssize_t bytesRead = pFile->read(buffer, FILE_BUFFER_SIZE);
                 if (bytesRead > 0)
                     read = true;
+                else
+                    break;
 
                 if (calculateMD5)
                     md5dos.write(buffer, bytesRead);
                 if (calculateSHA1)
                     sha1dos.write(buffer, bytesRead);
-            } while (bytesRead > 0);
+            } 
 
-            if (!read) {
-                // Close the digest stream
-                md5dos.close();
-                sha1dos.close();
+            if (read) {
+                if (calculateMD5) {
+                    md5dos.flush();
+                    const Poco::DigestEngine::Digest md5Digest = md5.digest();
+                    std::string hashStr = Poco::DigestEngine::digestToHex(md5Digest);
+                    pFile->setHash(TskImgDB::MD5, hashStr);
+                }
 
-                // Close file.
-                pFile->close();
-                return TskModule::OK;
-            }
-
-            if (calculateMD5) {
-                md5dos.flush();
-                const Poco::DigestEngine::Digest md5Digest = md5.digest();
-                std::string hashStr = Poco::DigestEngine::digestToHex(md5Digest);
-                pFile->setHash(TskImgDB::MD5, hashStr);
-            }
-
-            if (calculateSHA1) {
-                sha1dos.flush();
-                const Poco::DigestEngine::Digest sha1Digest = sha1.digest();
-                std::string hashStr = Poco::DigestEngine::digestToHex(sha1Digest);
-                pFile->setHash(TskImgDB::SHA1, hashStr);
+                if (calculateSHA1) {
+                    sha1dos.flush();
+                    const Poco::DigestEngine::Digest sha1Digest = sha1.digest();
+                    std::string hashStr = Poco::DigestEngine::digestToHex(sha1Digest);
+                    pFile->setHash(TskImgDB::SHA1, hashStr);
+                }
             }
 
             // Close the digest stream
