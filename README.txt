@@ -17,3 +17,5 @@ USAGE
 The initialize() method takes an argument to define what hash calculations
 to perform.  If nothing is specified, both hash values are calculated.
 Otherwise, itlooks for the string "MD5" or "SHA1" in the argument string.
+
+Added from main_repo.
