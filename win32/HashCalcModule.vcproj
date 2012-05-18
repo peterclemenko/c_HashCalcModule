@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="EntropyModule"
-	ProjectGUID="{00E3B0EE-B612-433A-A43E-1CE0B3DE1015}"
+	Name="HashCalcModule"
+	ProjectGUID="{46CD18AC-3A1C-405D-B39F-F86BA0FD1820}"
 	RootNamespace="EntropyModule"
 	TargetFrameworkVersion="196613"
 	>
