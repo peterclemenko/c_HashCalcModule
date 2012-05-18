@@ -1,21 +1,21 @@
 Hash Calculation Module
 Sleuth Kit Framework C++ Module
-April 2012
+May 2012
 
 
-This module is for the C++ Sleuth Kit Framework. 
+This module is for the C++ Sleuth Kit Framework.
 
 
 DESCRIPTION
 
-This module is for a file analysis pipeline.  It calculates the MD5
-and/or SHA1 hash of a given file and saves the result to the database.
-
+This module is a file analysis module that calculates 
+hash values of file content.
 
 USAGE
 
-The initialize() method takes an argument to define what hash calculations
-to perform.  If nothing is specified, both hash values are calculated.
-Otherwise, itlooks for the string "MD5" or "SHA1" in the argument string.
+Configure the file analysis pipeline to include this module.
 
-Added from main_repo, 2.
+This module takes arguments to determine which hashes to calculate. 
+Valid values are "MD5", "SHA1" or the empty string which will result
+in both hashes being calculated. Hash names can be in any order and 
+may be separated by spaces or commas. 
