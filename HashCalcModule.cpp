@@ -9,7 +9,22 @@
  */
 
 /** \file HashCalcModule.cpp 
- * C++ Framework module that calculates hash values of file content. */
+ * Contains the implementation of the hash calculation file analysis module.
+ * 
+ * MODULE DESCRIPTION
+ * 
+ * This module is a file analysis module that calculates hash values of the 
+ * contents of a given file.
+ * 
+ * MODULE USAGE
+ * 
+ * Configure the file analysis pipeline to include this module by adding a 
+ * "MODULE" element to the pipeline configuration file. Set the "arguments" 
+ * attribute of the "MODULE" element to specify which hashes to calculate. 
+ * Valid values are "MD5", "SHA1", or the empty string, which will result
+ * in both hashes being calculated. Hash names can be in any order and 
+ * may be separated by spaces or commas.
+ */
 
 // System includes
 #include <sstream>
@@ -41,7 +56,8 @@ extern "C"
      * @param args Valid values are "MD5", "SHA1" or the empty string which will 
      * result in both hashes being calculated. Hash names can be in any order,
      * separated by spaces or commas. 
-     * @return TskModule::OK if initialization succeeded, otherwise TskModule::FAIL.
+     * @return TskModule::OK if initialization arguments are valid, otherwise 
+     * TskModule::FAIL.
      */
     TskModule::Status TSK_MODULE_EXPORT initialize(std::string& arguments)
     {
@@ -76,7 +92,8 @@ extern "C"
     /**
      * Module execution function. Receives a pointer to a file the module is to
      * process. The file is represented by a TskFile interface which is used
-     * to read the contents of the file and post calcualted hashes to the database.
+     * to read the contents of the file and post calculated hashes of the 
+     * file contents to the database.
      *
      * @param pFile A pointer to a file for which the hash calculations are to be performed.
      * @returns TskModule::OK on success, TskModule::FAIL on error.
@@ -154,14 +171,14 @@ extern "C"
         catch (TskException& tskEx)
         {
             std::wstringstream msg;
-            msg << L"HashCalcModule - Caught framework exception: " << tskEx.what();
+            msg << L"HashCalcModule - Error processing file id " << pFile->getId() << L": " << tskEx.what();
             LOGERROR(msg.str());
             return TskModule::FAIL;
         }
         catch (std::exception& ex)
         {
             std::wstringstream msg;
-            msg << L"HashCalcModule - Caught exception: " << ex.what();
+            msg << L"HashCalcModule - Error processing file id " << pFile->getId() << L": " << ex.what();
             LOGERROR(msg.str());
             return TskModule::FAIL;
         }
@@ -170,9 +187,10 @@ extern "C"
     }
 
     /**
-     * Module cleanup function. This module does not need to do any cleanup.
+     * Module cleanup function. This module does not need to free any 
+     * resources allocated during initialization or execution.
      *
-     * @returns TskModule::OK 
+     * @returns TskModule::OK
      */
     TskModule::Status TSK_MODULE_EXPORT finalize()
     {
