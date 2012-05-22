@@ -6,16 +6,30 @@ May 2012
 This module is for the C++ Sleuth Kit Framework.
 
 
-MODULE DESCRIPTION
+DESCRIPTION
 
-This module is a file analysis module that calculates hash values of the 
-contents of a given file.
+This module is a file analysis module that calculates 
+MD5 or SHA-1 hash values of file content.  Hash values
+are used to detect known files and are used to later show
+that file content has not changed. 
 
-MODULE USAGE
 
-Configure the file analysis pipeline to include this module by adding a 
-"MODULE" element to the pipeline configuration file. Set the "arguments" 
-attribute of the "MODULE" element to specify which hashes to calculate. 
-Valid values are "MD5", "SHA1", or the empty string, which will result
-in both hashes being calculated. Hash names can be in any order and 
-may be separated by spaces or commas.
+USAGE
+
+Add this module to a file analysis pipeline.  See the TSK 
+Framework documents for information on adding the module 
+to the pipeline:
+
+    http://www.sleuthkit.org/sleuthkit/docs/framework-docs/
+
+By default, the module will calculate both MD5 and SHA-1 hashes.
+To configure the module to calculate only one of these values,
+then pass either "MD5" or "SHA1" in the pipeline config file.
+If you want to specify that both be calculated, then specify
+both strings in any order and with spaces or commas in between. 
+
+
+RESULTS
+
+The hash values are stored in the central database. 
+
