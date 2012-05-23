@@ -95,9 +95,6 @@ extern "C"
                 return TskModule::FAIL;
             }
 
-            // Open file.
-            pFile->open();
-
             // Initialize hash engine
             Poco::MD5Engine md5;
             Poco::DigestOutputStream md5dos(md5);
@@ -147,9 +144,6 @@ extern "C"
             // Close the digest stream
             md5dos.close();
             sha1dos.close();
-
-            // Close file.
-            pFile->close();
         }
         catch (TskException& tskEx)
         {
