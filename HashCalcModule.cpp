@@ -81,20 +81,16 @@ extern "C"
      * @param pFile A pointer to a file for which the hash calculations are to be performed.
      * @returns TskModule::OK on success, TskModule::FAIL on error.
      */
-    TskModule::Status TSK_MODULE_EXPORT run(TskFile * pFile) {
-        if (pFile == NULL) {
+    TskModule::Status TSK_MODULE_EXPORT run(TskFile * pFile) 
+    {
+        if (pFile == NULL) 
+        {
             LOGERROR(L"HashCalcModule: passed NULL file pointer.");
             return TskModule::FAIL;
         }
 
-        try {
-            if (!pFile->exists()) {
-                std::wstringstream msg;
-                msg << L"HashCalcModule: File to be analyzed does not exist: " << pFile->getPath().c_str();
-                LOGERROR(msg.str());
-                return TskModule::FAIL;
-            }
-
+        try 
+        {
             // Initialize hash engine
             Poco::MD5Engine md5;
             Poco::DigestOutputStream md5dos(md5);
@@ -107,7 +103,9 @@ extern "C"
             bool read = false;
 
             // Read file content into buffer and write it to the DigestOutputStream.
-            do {
+            do 
+            {
+                memset(buffer, 0, FILE_BUFFER_SIZE);
                 bytesRead = pFile->read(buffer, FILE_BUFFER_SIZE);
                 if (bytesRead > 0)
                     read = true;
@@ -117,24 +115,25 @@ extern "C"
                     sha1dos.write(buffer, bytesRead);
             } while (bytesRead > 0);
 
-            if (!read) {
+            if (!read) 
+            {
                 // Close the digest stream
                 md5dos.close();
                 sha1dos.close();
 
-                // Close file.
-                pFile->close();
                 return TskModule::OK;
             }
 
-            if (calculateMD5) {
+            if (calculateMD5) 
+            {
                 md5dos.flush();
                 const Poco::DigestEngine::Digest md5Digest = md5.digest();
                 std::string hashStr = Poco::DigestEngine::digestToHex(md5Digest);
                 pFile->setHash(TskImgDB::MD5, hashStr);
             }
 
-            if (calculateSHA1) {
+            if (calculateSHA1) 
+            {
                 sha1dos.flush();
                 const Poco::DigestEngine::Digest sha1Digest = sha1.digest();
                 std::string hashStr = Poco::DigestEngine::digestToHex(sha1Digest);
