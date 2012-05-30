@@ -10,20 +10,6 @@
 
 /** \file HashCalcModule.cpp 
  * Contains the implementation of the hash calculation file analysis module.
- * 
- * MODULE DESCRIPTION
- * 
- * This module is a file analysis module that calculates hash values of the 
- * contents of a given file.
- * 
- * MODULE USAGE
- * 
- * Configure the file analysis pipeline to include this module by adding a 
- * "MODULE" element to the pipeline configuration file. Set the "arguments" 
- * attribute of the "MODULE" element to specify which hashes to calculate. 
- * Valid values are "MD5", "SHA1", or the empty string, which will result
- * in both hashes being calculated. Hash names can be in any order and 
- * may be separated by spaces or commas.
  */
 
 // System includes
@@ -48,6 +34,45 @@ static bool calculateSHA1 = false;
 
 extern "C" 
 {
+    #ifdef _MSC_VER
+        #pragma warning( push )
+        #pragma warning( disable: 4190 )
+    #endif
+ 
+    /**
+     * Module identification function. 
+     *
+     * @return The name of the module as a std::string.
+     */
+    std::string name()
+    {
+        return "HashCalc";
+    }
+
+    /**
+     * Module identification function. 
+     *
+     * @return A description of the module as a std::string.
+     */
+    std::string description()
+    {
+        return "";
+    }
+
+    /**
+     * Module identification function. 
+     *
+     * @return The version of the module as a std::string.
+     */
+    std::string version()
+    {
+        return "0.0.0";
+    }
+
+    #ifdef _MSC_VER
+        #pragma warning( pop )
+    #endif
+
     /**
      * Module initialization function. Receives arguments, typically read by the
      * caller from a pipeline configuration file, that determine what hashes the 
