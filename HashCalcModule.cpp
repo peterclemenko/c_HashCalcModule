@@ -13,6 +13,7 @@
  */
 
 // System includes
+#include <string>
 #include <sstream>
 
 // Framework includes
@@ -34,17 +35,12 @@ static bool calculateSHA1 = false;
 
 extern "C" 
 {
-    #ifdef _MSC_VER
-        #pragma warning( push )
-        #pragma warning( disable: 4190 )
-    #endif
- 
     /**
      * Module identification function. 
      *
      * @return The name of the module as a std::string.
      */
-    std::string name()
+    const char* name()
     {
         return "HashCalc";
     }
@@ -54,7 +50,7 @@ extern "C"
      *
      * @return A description of the module as a std::string.
      */
-    std::string description()
+    const char* description()
     {
         return "";
     }
@@ -64,14 +60,10 @@ extern "C"
      *
      * @return The version of the module as a std::string.
      */
-    std::string version()
+    const char* version()
     {
         return "0.0.0";
     }
-
-    #ifdef _MSC_VER
-        #pragma warning( pop )
-    #endif
 
     /**
      * Module initialization function. Receives arguments, typically read by the
@@ -84,21 +76,23 @@ extern "C"
      * @return TskModule::OK if initialization arguments are valid, otherwise 
      * TskModule::FAIL.
      */
-    TskModule::Status TSK_MODULE_EXPORT initialize(std::string& arguments)
+    TskModule::Status TSK_MODULE_EXPORT initialize(const char* arguments)
     {
+        std::string args(arguments);
+
         // If the argument string is empty we calculate both hashes.
-        if (arguments.empty()) {
+        if (args.empty()) {
             calculateMD5 = true;
             calculateSHA1 = true;
             return TskModule::OK;
         }
 
         // If the argument string contains "MD5" we calculate an MD5 hash.
-        if (arguments.find(MD5_NAME) != std::string::npos)
+        if (args.find(MD5_NAME) != std::string::npos)
             calculateMD5 = true;
 
         // If the argument string contains "SHA1" we calculate a SHA1 hash.
-        if (arguments.find(SHA1_NAME) != std::string::npos)
+        if (args.find(SHA1_NAME) != std::string::npos)
             calculateSHA1 = true;
 
         // If neither hash is to be calculated it means that the arguments
@@ -106,7 +100,7 @@ extern "C"
         // through the framework logging facility.
         if (!calculateMD5 && !calculateSHA1) {
             std::wstringstream msg;
-            msg << L"Invalid arguments passed to hash module: " << arguments.c_str();
+            msg << L"Invalid arguments passed to hash module: " << args.c_str();
             LOGERROR(msg.str());
             return TskModule::FAIL;
         }
