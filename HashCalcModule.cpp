@@ -10,23 +10,10 @@
 
 /** \file HashCalcModule.cpp 
  * Contains the implementation of the hash calculation file analysis module.
- * 
- * MODULE DESCRIPTION
- * 
- * This module is a file analysis module that calculates hash values of the 
- * contents of a given file.
- * 
- * MODULE USAGE
- * 
- * Configure the file analysis pipeline to include this module by adding a 
- * "MODULE" element to the pipeline configuration file. Set the "arguments" 
- * attribute of the "MODULE" element to specify which hashes to calculate. 
- * Valid values are "MD5", "SHA1", or the empty string, which will result
- * in both hashes being calculated. Hash names can be in any order and 
- * may be separated by spaces or commas.
  */
 
 // System includes
+#include <string>
 #include <sstream>
 
 // Framework includes
@@ -49,6 +36,36 @@ static bool calculateSHA1 = false;
 extern "C" 
 {
     /**
+     * Module identification function. 
+     *
+     * @return The name of the module as a std::string.
+     */
+    const char* name()
+    {
+        return "HashCalc";
+    }
+
+    /**
+     * Module identification function. 
+     *
+     * @return A description of the module as a std::string.
+     */
+    const char* description()
+    {
+        return "";
+    }
+
+    /**
+     * Module identification function. 
+     *
+     * @return The version of the module as a std::string.
+     */
+    const char* version()
+    {
+        return "0.0.0";
+    }
+
+    /**
      * Module initialization function. Receives arguments, typically read by the
      * caller from a pipeline configuration file, that determine what hashes the 
      * module calculates for a given file.
@@ -59,21 +76,23 @@ extern "C"
      * @return TskModule::OK if initialization arguments are valid, otherwise 
      * TskModule::FAIL.
      */
-    TskModule::Status TSK_MODULE_EXPORT initialize(std::string& arguments)
+    TskModule::Status TSK_MODULE_EXPORT initialize(const char* arguments)
     {
+        std::string args(arguments);
+
         // If the argument string is empty we calculate both hashes.
-        if (arguments.empty()) {
+        if (args.empty()) {
             calculateMD5 = true;
             calculateSHA1 = true;
             return TskModule::OK;
         }
 
         // If the argument string contains "MD5" we calculate an MD5 hash.
-        if (arguments.find(MD5_NAME) != std::string::npos)
+        if (args.find(MD5_NAME) != std::string::npos)
             calculateMD5 = true;
 
         // If the argument string contains "SHA1" we calculate a SHA1 hash.
-        if (arguments.find(SHA1_NAME) != std::string::npos)
+        if (args.find(SHA1_NAME) != std::string::npos)
             calculateSHA1 = true;
 
         // If neither hash is to be calculated it means that the arguments
@@ -81,7 +100,7 @@ extern "C"
         // through the framework logging facility.
         if (!calculateMD5 && !calculateSHA1) {
             std::wstringstream msg;
-            msg << L"Invalid arguments passed to hash module: " << arguments.c_str();
+            msg << L"Invalid arguments passed to hash module: " << args.c_str();
             LOGERROR(msg.str());
             return TskModule::FAIL;
         }
