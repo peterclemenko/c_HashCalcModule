@@ -125,6 +125,11 @@ extern "C"
             return TskModule::FAIL;
         }
 
+        // We will not attempt to calculate hash values for "unused sector"
+        // files.
+        if (pFile->getTypeId() == TskImgDB::IMGDB_FILES_TYPE_UNUSED)
+            return TskModule::OK;
+
         try 
         {
             // Initialize hash engine
