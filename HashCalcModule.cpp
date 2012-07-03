@@ -52,7 +52,7 @@ extern "C"
      */
     TSK_MODULE_EXPORT const char *description()
     {
-        return "";
+        return "Calculates MD5 and/or SHA-1 hashes of file content";
     }
 
     /**
