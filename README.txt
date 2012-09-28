@@ -13,6 +13,9 @@ MD5 or SHA-1 hash values of file content.  Hash values
 are used to detect known files and are used to later show
 that file content has not changed. 
 
+DEPLOYMENT REQUIREMENTS
+
+This module does not have any specific deployment requirements.
 
 USAGE
 
