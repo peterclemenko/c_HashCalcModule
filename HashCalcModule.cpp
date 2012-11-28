@@ -1,16 +1,16 @@
 /*
- * The Sleuth Kit
- *
- * Contact: Brian Carrier [carrier <at> sleuthkit [dot] org]
- * Copyright (c) 2011-2012 Basis Technology Corporation. All Rights
- * reserved.
- *
- * This software is distributed under the Common Public License 1.0
- */
+* The Sleuth Kit
+*
+* Contact: Brian Carrier [carrier <at> sleuthkit [dot] org]
+* Copyright (c) 2011-2012 Basis Technology Corporation. All Rights
+* reserved.
+*
+* This software is distributed under the Common Public License 1.0
+*/
 
 /** \file HashCalcModule.cpp 
- * Contains the implementation of the hash calculation file analysis module.
- */
+* Contains the implementation of the hash calculation file analysis module.
+*/
 
 // System includes
 #include <string>
@@ -19,63 +19,58 @@
 // Framework includes
 #include "TskModuleDev.h"
 
-// Poco includes
-#include "Poco/MD5Engine.h"
-#include "Poco/SHA1Engine.h"
-#include "Poco/DigestStream.h"
-
-// We process the file 8k at a time
-static const uint32_t FILE_BUFFER_SIZE = 8192;
-
+// strings for command line arguments
 static const std::string MD5_NAME("MD5");
 static const std::string SHA1_NAME("SHA1");
 
-static bool calculateMD5 = false;
+static bool calculateMD5 = true;
 static bool calculateSHA1 = false;
+
+static const char hexMap[] = "0123456789abcdef";
 
 extern "C" 
 {
     /**
-     * Module identification function. 
-     *
-     * @return The name of the module.
-     */
+    * Module identification function. 
+    *
+    * @return The name of the module.
+    */
     TSK_MODULE_EXPORT const char *name()
     {
         return "HashCalc";
     }
 
     /**
-     * Module identification function. 
-     *
-     * @return A description of the module.
-     */
+    * Module identification function. 
+    *
+    * @return A description of the module.
+    */
     TSK_MODULE_EXPORT const char *description()
     {
         return "Calculates MD5 and/or SHA-1 hashes of file content";
     }
 
     /**
-     * Module identification function. 
-     *
-     * @return The version of the module.
-     */
+    * Module identification function. 
+    *
+    * @return The version of the module.
+    */
     TSK_MODULE_EXPORT const char *version()
     {
-        return "1.0.0";
+        return "1.0.1";
     }
 
     /**
-     * Module initialization function. Receives arguments, typically read by the
-     * caller from a pipeline configuration file, that determine what hashes the 
-     * module calculates for a given file.
-     *
-     * @param args Valid values are "MD5", "SHA1" or the empty string which will 
-     * result in both hashes being calculated. Hash names can be in any order,
-     * separated by spaces or commas. 
-     * @return TskModule::OK if initialization arguments are valid, otherwise 
-     * TskModule::FAIL.
-     */
+    * Module initialization function. Receives arguments, typically read by the
+    * caller from a pipeline configuration file, that determine what hashes the 
+    * module calculates for a given file.
+    *
+    * @param args Valid values are "MD5", "SHA1" or the empty string which will 
+    * result in both hashes being calculated. Hash names can be in any order,
+    * separated by spaces or commas. 
+    * @return TskModule::OK if initialization arguments are valid, otherwise 
+    * TskModule::FAIL.
+    */
     TskModule::Status TSK_MODULE_EXPORT initialize(const char* arguments)
     {
         std::string args(arguments);
@@ -83,40 +78,49 @@ extern "C"
         // If the argument string is empty we calculate both hashes.
         if (args.empty()) {
             calculateMD5 = true;
-            calculateSHA1 = true;
-            return TskModule::OK;
+            calculateSHA1 = false;
+        }
+        else {
+            calculateMD5 = false;
+            calculateSHA1 = false;
+
+            // If the argument string contains "MD5" we calculate an MD5 hash.
+            if (args.find(MD5_NAME) != std::string::npos) 
+                calculateMD5 = true;
+
+            // If the argument string contains "SHA1" we calculate a SHA1 hash.
+            if (args.find(SHA1_NAME) != std::string::npos) 
+                calculateSHA1 = true;
+
+            // If neither hash is to be calculated it means that the arguments
+            // passed to the module were incorrect. We log an error message
+            // through the framework logging facility.
+            if (!calculateMD5 && !calculateSHA1) {
+                std::wstringstream msg;
+                msg << L"Invalid arguments passed to hash module: " << args.c_str();
+                LOGERROR(msg.str());
+                return TskModule::FAIL;
+            }
         }
 
-        // If the argument string contains "MD5" we calculate an MD5 hash.
-        if (args.find(MD5_NAME) != std::string::npos)
-            calculateMD5 = true;
+        if (calculateMD5)
+            LOGINFO("HashCalcModule: Configured to calculate MD5 hashes");
 
-        // If the argument string contains "SHA1" we calculate a SHA1 hash.
-        if (args.find(SHA1_NAME) != std::string::npos)
-            calculateSHA1 = true;
-
-        // If neither hash is to be calculated it means that the arguments
-        // passed to the module were incorrect. We log an error message
-        // through the framework logging facility.
-        if (!calculateMD5 && !calculateSHA1) {
-            std::wstringstream msg;
-            msg << L"Invalid arguments passed to hash module: " << args.c_str();
-            LOGERROR(msg.str());
-            return TskModule::FAIL;
-        }
+        if (calculateSHA1)
+            LOGINFO("HashCalcModule: Configured to calculate SHA-1 hashes");
 
         return TskModule::OK;
     }
 
     /**
-     * Module execution function. Receives a pointer to a file the module is to
-     * process. The file is represented by a TskFile interface which is used
-     * to read the contents of the file and post calculated hashes of the 
-     * file contents to the database.
-     *
-     * @param pFile A pointer to a file for which the hash calculations are to be performed.
-     * @returns TskModule::OK on success, TskModule::FAIL on error.
-     */
+    * Module execution function. Receives a pointer to a file the module is to
+    * process. The file is represented by a TskFile interface which is used
+    * to read the contents of the file and post calculated hashes of the 
+    * file contents to the database.
+    *
+    * @param pFile A pointer to a file for which the hash calculations are to be performed.
+    * @returns TskModule::OK on success, TskModule::FAIL on error.
+    */
     TskModule::Status TSK_MODULE_EXPORT run(TskFile * pFile) 
     {
         if (pFile == NULL) 
@@ -132,58 +136,60 @@ extern "C"
 
         try 
         {
-            // Initialize hash engine
-            Poco::MD5Engine md5;
-            Poco::DigestOutputStream md5dos(md5);
+            TSK_MD5_CTX md5Ctx;
+            TSK_SHA_CTX sha1Ctx;
 
-            Poco::SHA1Engine sha1;
-            Poco::DigestOutputStream sha1dos(sha1);
+            if (calculateMD5)
+                TSK_MD5_Init(&md5Ctx);
 
+            if (calculateSHA1)
+                TSK_SHA_Init(&sha1Ctx);
+
+            // file buffer
+            static const uint32_t FILE_BUFFER_SIZE = 32768;
             char buffer[FILE_BUFFER_SIZE];
-            int bytesRead = 0;
-            bool read = false;
+
+            ssize_t bytesRead = 0;
 
             // Read file content into buffer and write it to the DigestOutputStream.
             do 
             {
-                memset(buffer, 0, FILE_BUFFER_SIZE);
                 bytesRead = pFile->read(buffer, FILE_BUFFER_SIZE);
-                if (bytesRead > 0)
-                    read = true;
-                if (calculateMD5)
-                    md5dos.write(buffer, bytesRead);
-                if (calculateSHA1)
-                    sha1dos.write(buffer, bytesRead);
+                if (bytesRead > 0) {
+                    if (calculateMD5)
+                        TSK_MD5_Update(&md5Ctx, (unsigned char *) buffer, (unsigned int) bytesRead);
+
+                    if (calculateSHA1)
+                        TSK_SHA_Update(&sha1Ctx, (unsigned char *) buffer, (unsigned int) bytesRead);                  
+                }
             } while (bytesRead > 0);
 
-            if (!read) 
-            {
-                // Close the digest stream
-                md5dos.close();
-                sha1dos.close();
+            if (calculateMD5) {
+                unsigned char md5Hash[16];
+                TSK_MD5_Final(md5Hash, &md5Ctx);
 
-                return TskModule::OK;
+                char md5TextBuff[33];            
+                for (int i = 0; i < 16; i++) {
+                    md5TextBuff[2 * i] = hexMap[(md5Hash[i] >> 4) & 0xf];
+                    md5TextBuff[2 * i + 1] = hexMap[md5Hash[i] & 0xf];
+                }
+                md5TextBuff[32] = '\0';
+                pFile->setHash(TskImgDB::MD5, md5TextBuff);
             }
 
-            if (calculateMD5) 
-            {
-                md5dos.flush();
-                const Poco::DigestEngine::Digest md5Digest = md5.digest();
-                std::string hashStr = Poco::DigestEngine::digestToHex(md5Digest);
-                pFile->setHash(TskImgDB::MD5, hashStr);
+            if (calculateSHA1) {
+                unsigned char sha1Hash[20];
+                TSK_SHA_Final(sha1Hash, &sha1Ctx);
+
+                char textBuff[41];            
+                for (int i = 0; i < 20; i++) {
+                    textBuff[2 * i] = hexMap[(sha1Hash[i] >> 4) & 0xf];
+                    textBuff[2 * i + 1] = hexMap[sha1Hash[i] & 0xf];
+                }
+                textBuff[40] = '\0';
+                pFile->setHash(TskImgDB::SHA1, textBuff);
             }
 
-            if (calculateSHA1) 
-            {
-                sha1dos.flush();
-                const Poco::DigestEngine::Digest sha1Digest = sha1.digest();
-                std::string hashStr = Poco::DigestEngine::digestToHex(sha1Digest);
-                pFile->setHash(TskImgDB::SHA1, hashStr);
-            }
-
-            // Close the digest stream
-            md5dos.close();
-            sha1dos.close();
         }
         catch (TskException& tskEx)
         {
@@ -204,11 +210,11 @@ extern "C"
     }
 
     /**
-     * Module cleanup function. This module does not need to free any 
-     * resources allocated during initialization or execution.
-     *
-     * @returns TskModule::OK
-     */
+    * Module cleanup function. This module does not need to free any 
+    * resources allocated during initialization or execution.
+    *
+    * @returns TskModule::OK
+    */
     TskModule::Status TSK_MODULE_EXPORT finalize()
     {
         return TskModule::OK;
