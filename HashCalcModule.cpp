@@ -15,6 +15,7 @@
 // System includes
 #include <string>
 #include <sstream>
+#include <string.h>
 
 // Framework includes
 #include "TskModuleDev.h"
@@ -99,8 +100,8 @@ extern "C"
         // passed to the module were incorrect. We log an error message
         // through the framework logging facility.
         if (!calculateMD5 && !calculateSHA1) {
-            std::wstringstream msg;
-            msg << L"Invalid arguments passed to hash module: " << args.c_str();
+            std::stringstream msg;
+            msg << "Invalid arguments passed to hash module: " << args.c_str();
             LOGERROR(msg.str());
             return TskModule::FAIL;
         }
@@ -121,7 +122,7 @@ extern "C"
     {
         if (pFile == NULL) 
         {
-            LOGERROR(L"HashCalcModule: passed NULL file pointer.");
+            LOGERROR("HashCalcModule: passed NULL file pointer.");
             return TskModule::FAIL;
         }
 
@@ -187,15 +188,15 @@ extern "C"
         }
         catch (TskException& tskEx)
         {
-            std::wstringstream msg;
-            msg << L"HashCalcModule - Error processing file id " << pFile->getId() << L": " << tskEx.what();
+            std::stringstream msg;
+            msg << "HashCalcModule - Error processing file id " << pFile->getId() << ": " << tskEx.what();
             LOGERROR(msg.str());
             return TskModule::FAIL;
         }
         catch (std::exception& ex)
         {
-            std::wstringstream msg;
-            msg << L"HashCalcModule - Error processing file id " << pFile->getId() << L": " << ex.what();
+            std::stringstream msg;
+            msg << "HashCalcModule - Error processing file id " << pFile->getId() << ": " << ex.what();
             LOGERROR(msg.str());
             return TskModule::FAIL;
         }
