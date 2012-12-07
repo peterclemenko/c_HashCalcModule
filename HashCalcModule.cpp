@@ -66,7 +66,7 @@ extern "C"
     * module calculates for a given file.
     *
     * @param args Valid values are "MD5", "SHA1" or the empty string which will 
-    * result in both hashes being calculated. Hash names can be in any order,
+    * result in just "MD5" being calculated. Hash names can be in any order,
     * separated by spaces or commas. 
     * @return TskModule::OK if initialization arguments are valid, otherwise 
     * TskModule::FAIL.

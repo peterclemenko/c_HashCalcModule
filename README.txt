@@ -27,7 +27,7 @@ to the pipeline:
 
     http://www.sleuthkit.org/sleuthkit/docs/framework-docs/
 
-By default, the module will calculate only a MD5 hashes.
+By default, the module will only calculate the MD5 hash.
 To configure the module to calculate SHA-1 or both values,
 then pass either "MD5" or "SHA1" in the pipeline config file.
 If you want to specify that both be calculated, then specify
