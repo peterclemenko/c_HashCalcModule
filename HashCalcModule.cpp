@@ -18,7 +18,7 @@
 #include <string.h>
 
 // Framework includes
-#include "TskModuleDev.h"
+#include "tsk/framework/utilities/TskModuleDev.h"
 
 // strings for command line arguments
 static const std::string MD5_NAME("MD5");
