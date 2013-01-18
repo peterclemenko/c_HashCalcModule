@@ -49,11 +49,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(TSK_HOME);$(TSK_HOME)\framework;$(POCO_HOME)\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(TSK_HOME);$(TSK_HOME)\framework;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libtskframework.lib;libtsk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(TSK_HOME)\framework\msvcpp\framework\$(Configuration);$(TSK_HOME)\win32\$(Configuration);$(POCO_HOME)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(TSK_HOME)\framework\msvcpp\framework\$(Configuration);$(TSK_HOME)\win32\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -66,7 +66,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(TSK_HOME);$(TSK_HOME)\framework;$(POCO_HOME)\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(TSK_HOME);$(TSK_HOME)\framework;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
@@ -74,7 +74,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libtskframework.lib;libtsk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(TSK_HOME)\framework\msvcpp\framework\$(Configuration);$(TSK_HOME)\win32\$(Configuration);$(POCO_HOME)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(TSK_HOME)\framework\msvcpp\framework\$(Configuration);$(TSK_HOME)\win32\$(Configuration)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
